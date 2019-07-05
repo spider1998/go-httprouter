@@ -6,12 +6,15 @@ import (
 )
 
 type Router struct {
-	Trees    map[string]*Tree
-	NotFound http.Handler
+	Trees     map[string]*Tree
+	NotFound  http.Handler
+	PathSlash bool
 }
 
 func New() *Router {
-	return &Router{}
+	return &Router{
+		PathSlash: true,
+	}
 }
 
 /*METHOD*/
@@ -71,6 +74,12 @@ func (r *Router) Handle(method, path string, handle Handle) {
 }
 
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	path := req.URL.Path
+	if r.PathSlash {
+		if len(path) > 1 && path[len(path)-1] == '/' {
+			req.URL.Path = path[:len(path)-1]
+		}
+	}
 	if root := r.Trees[req.Method]; root != nil {
 		if handle, _ := root.Get(req.URL.Path); handle != nil {
 			handle.(Handle)(w, req, nil)
