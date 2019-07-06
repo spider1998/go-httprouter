@@ -1,22 +1,22 @@
-package mian
+package main
 
 import (
 	"fmt"
+	g "go-httprouter"
 	"log"
 	"net/http"
-	"test_route/radix"
 )
 
-func Index(w http.ResponseWriter, r *http.Request, ps radix.Params) {
+func Index(w http.ResponseWriter, r *http.Request, ps g.Params) {
 	_, _ = fmt.Fprint(w, "Welcome!\n")
 }
 
-func Hello(w http.ResponseWriter, r *http.Request, ps radix.Params) {
+func Hello(w http.ResponseWriter, r *http.Request, ps g.Params) {
 	_, _ = fmt.Fprint(w, "Hello World!\n")
 }
 
 func main() {
-	router := radix.New()
+	router := g.New()
 	router.GET("/", Index)
 	router.GET("/hello", Hello)
 	log.Println("start run...")

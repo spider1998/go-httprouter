@@ -192,6 +192,6 @@ func (s Sons) Sort() {
 	sort.Sort(s)
 }
 
-func (t *Tree) AddRoute(path string, handle Handle) {
-	t.Insert(path, handle)
+func (t *Tree) AddRoute(path string, handles []Handle) {
+	t.Insert(path, handles)
 }

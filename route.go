@@ -19,32 +19,32 @@ func New() *Router {
 }
 
 /*METHOD*/
-func (r *Router) GET(path string, handle Handle) {
-	r.Handle("GET", path, handle)
+func (r *Router) GET(path string, handles ...Handle) {
+	r.Handle("GET", path, handles)
 }
 
-func (r *Router) HEAD(path string, handle Handle) {
-	r.Handle("HEAD", path, handle)
+func (r *Router) HEAD(path string, handles ...Handle) {
+	r.Handle("HEAD", path, handles)
 }
 
-func (r *Router) OPTIONS(path string, handle Handle) {
-	r.Handle("OPTIONS", path, handle)
+func (r *Router) OPTIONS(path string, handles ...Handle) {
+	r.Handle("OPTIONS", path, handles)
 }
 
-func (r *Router) POST(path string, handle Handle) {
-	r.Handle("POST", path, handle)
+func (r *Router) POST(path string, handles ...Handle) {
+	r.Handle("POST", path, handles)
 }
 
-func (r *Router) PUT(path string, handle Handle) {
-	r.Handle("PUT", path, handle)
+func (r *Router) PUT(path string, handles ...Handle) {
+	r.Handle("PUT", path, handles)
 }
 
-func (r *Router) PATCH(path string, handle Handle) {
-	r.Handle("PATCH", path, handle)
+func (r *Router) PATCH(path string, handles ...Handle) {
+	r.Handle("PATCH", path, handles)
 }
 
-func (r *Router) DELETE(path string, handle Handle) {
-	r.Handle("DELETE", path, handle)
+func (r *Router) DELETE(path string, handles ...Handle) {
+	r.Handle("DELETE", path, handles)
 }
 
 type Handle func(http.ResponseWriter, *http.Request, Params)
@@ -56,7 +56,7 @@ type Param struct {
 
 type Params []Param
 
-func (r *Router) Handle(method, path string, handle Handle) {
+func (r *Router) Handle(method, path string, handles []Handle) {
 	if path[0] != '/' {
 		panic("path must begin with '/' in path '" + path + "'")
 	}
@@ -71,7 +71,7 @@ func (r *Router) Handle(method, path string, handle Handle) {
 		r.Trees[method] = root
 	}
 
-	root.AddRoute(path, handle)
+	root.AddRoute(path, handles)
 }
 
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -85,9 +85,10 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		path = req.URL.EscapedPath()
 	}
 	if root := r.Trees[req.Method]; root != nil {
-		if handle, _ := root.Get(path); handle != nil {
-			handle.(Handle)(w, req, nil)
-
+		if handles, _ := root.Get(path); handles != nil {
+			for _, handle := range handles.([]Handle) {
+				handle(w, req, nil)
+			}
 			return
 		}
 	}
@@ -112,11 +113,13 @@ var ParamsKey = paramsKey{}
 // request context under ParamsKey.
 func (r *Router) Handler(method, path string, handler http.Handler) {
 	r.Handle(method, path,
-		func(w http.ResponseWriter, req *http.Request, p Params) {
-			ctx := req.Context()
-			ctx = context.WithValue(ctx, ParamsKey, p)
-			req = req.WithContext(ctx)
-			handler.ServeHTTP(w, req)
+		[]Handle{
+			func(w http.ResponseWriter, req *http.Request, p Params) {
+				ctx := req.Context()
+				ctx = context.WithValue(ctx, ParamsKey, p)
+				req = req.WithContext(ctx)
+				handler.ServeHTTP(w, req)
+			},
 		},
 	)
 }
