@@ -6,9 +6,10 @@ import (
 )
 
 type Router struct {
-	Trees     map[string]*Tree
-	NotFound  http.Handler
-	PathSlash bool
+	Trees          map[string]*Tree
+	NotFound       http.Handler
+	PathSlash      bool
+	UseEscapedPath bool
 }
 
 func New() *Router {
@@ -77,11 +78,14 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
 	if r.PathSlash {
 		if len(path) > 1 && path[len(path)-1] == '/' {
-			req.URL.Path = path[:len(path)-1]
+			path = path[:len(path)-1]
 		}
 	}
+	if r.UseEscapedPath {
+		path = req.URL.EscapedPath()
+	}
 	if root := r.Trees[req.Method]; root != nil {
-		if handle, _ := root.Get(req.URL.Path); handle != nil {
+		if handle, _ := root.Get(path); handle != nil {
 			handle.(Handle)(w, req, nil)
 
 			return
