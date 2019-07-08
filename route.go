@@ -1,3 +1,6 @@
+//router.go文件
+
+//提供简单http路由
 package go_httprouter
 
 import (
@@ -5,6 +8,7 @@ import (
 	"net/http"
 )
 
+//Router 路由结构体
 type Router struct {
 	Trees                  map[string]*Tree
 	PanicHandler           func(http.ResponseWriter, *http.Request)
@@ -16,6 +20,9 @@ type Router struct {
 	MethodNotAllowed       http.Handler
 }
 
+//New 创建新的路由
+//	router := g.New()
+//返回路由实例
 func New() *Router {
 	return &Router{
 		PathSlash:              true,
@@ -24,37 +31,47 @@ func New() *Router {
 	}
 }
 
-/*METHOD*/
+//GET get方法
+//	router.GET("/", Index)
+//以下方法类似
 func (r *Router) GET(path string, handles ...Handle) {
 	r.Handle("GET", path, handles)
 }
 
+//HEAD head方法
 func (r *Router) HEAD(path string, handles ...Handle) {
 	r.Handle("HEAD", path, handles)
 }
 
+//OPTIONS options方法
 func (r *Router) OPTIONS(path string, handles ...Handle) {
 	r.Handle("OPTIONS", path, handles)
 }
 
+//POST post方法
 func (r *Router) POST(path string, handles ...Handle) {
 	r.Handle("POST", path, handles)
 }
 
+//PUT put方法
 func (r *Router) PUT(path string, handles ...Handle) {
 	r.Handle("PUT", path, handles)
 }
 
+//PATCH patch方法
 func (r *Router) PATCH(path string, handles ...Handle) {
 	r.Handle("PATCH", path, handles)
 }
 
+//DELETE delete方法
 func (r *Router) DELETE(path string, handles ...Handle) {
 	r.Handle("DELETE", path, handles)
 }
 
+//Handle 路由处理函数
 type Handle func(http.ResponseWriter, *http.Request, Params)
 
+//Param 路由处理参数（暂留）
 type Param struct {
 	Key   string
 	Value string
@@ -62,6 +79,9 @@ type Param struct {
 
 type Params []Param
 
+//Handle 处理路由函数
+//	r.Handle("GET", path, handles)
+//存储路由
 func (r *Router) Handle(method, path string, handles []Handle) {
 	if path[0] != '/' {
 		panic("path must begin with '/' in path '" + path + "'")
@@ -80,6 +100,7 @@ func (r *Router) Handle(method, path string, handles []Handle) {
 	root.AddRoute(path, handles)
 }
 
+//ServeHTTP 实现ServeHTTP方法
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
 
@@ -141,6 +162,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+//HandlerFunc 内置处理函数
 func (r *Router) HandlerFunc(method, path string, handler http.HandlerFunc) {
 	r.Handler(method, path, handler)
 }

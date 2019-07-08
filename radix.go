@@ -1,3 +1,6 @@
+//radix.go文件
+
+//提供路由处理存储
 package go_httprouter
 
 import (
@@ -27,6 +30,9 @@ func NewTree() *Tree {
 	}
 }
 
+//Insert 存储路由处理信息
+//	t.Insert(path, handles)
+//基数树
 func (t *Tree) Insert(key string, value interface{}) (interface{}, bool) {
 	search := key
 	n := t.Root
@@ -110,6 +116,14 @@ func (t *Tree) Insert(key string, value interface{}) (interface{}, bool) {
 	}
 }
 
+//GET 通过路由获取处理函数
+//	if handles, _ := root.Get(path); handles != nil {
+//			for _, handle := range handles.([]Handle) {
+//				handle(w, req, nil)
+//			}
+//			return
+//		}
+//返回接口类型
 func (t *Tree) Get(s string) (interface{}, bool) {
 	n := t.Root
 	search := s
