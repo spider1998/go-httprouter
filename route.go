@@ -40,7 +40,7 @@ func New() *Router {
 
 func (r *Router) Group(prefix string, handlers []Handler) *Router {
 	r.RouteGroup = RouteGroup{
-		Prefix:   prefix,
+		Prefix:   r.Prefix + prefix,
 		Handlers: handlers,
 	}
 	return r
