@@ -18,8 +18,19 @@ func Hello(w http.ResponseWriter, r *http.Request, ps g.Params) {
 
 func TestHttptouter(t *testing.T) {
 	router := g.New()
+	router.Group("/test1", nil)
 	router.GET("/", Index)
 	router.GET("/hello", Hello)
+	log.Println("start run...")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+func TestRouterGroup(t *testing.T) {
+	router := g.New()
+	test1 := router.Group("/test1", nil)
+	test1.GET("/index", Index)
+	test2 := router.Group("/test2", nil)
+	test2.GET("/hello", Hello)
 	log.Println("start run...")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
