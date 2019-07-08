@@ -6,15 +6,20 @@ import (
 )
 
 type Router struct {
-	Trees          map[string]*Tree
-	NotFound       http.Handler
-	PathSlash      bool
-	UseEscapedPath bool
+	Trees                  map[string]*Tree
+	NotFound               http.Handler
+	PathSlash              bool
+	UseEscapedPath         bool
+	HandleOptions          bool
+	HandleMethodNotAllowed bool
+	MethodNotAllowed       http.Handler
 }
 
 func New() *Router {
 	return &Router{
-		PathSlash: true,
+		PathSlash:              true,
+		HandleMethodNotAllowed: true,
+		HandleOptions:          true,
 	}
 }
 
@@ -76,14 +81,20 @@ func (r *Router) Handle(method, path string, handles []Handle) {
 
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
+
+	//USE_SLASH
 	if r.PathSlash {
 		if len(path) > 1 && path[len(path)-1] == '/' {
 			path = path[:len(path)-1]
 		}
 	}
+
+	//USE_ESCAPES
 	if r.UseEscapedPath {
 		path = req.URL.EscapedPath()
 	}
+
+	//Handle
 	if root := r.Trees[req.Method]; root != nil {
 		if handles, _ := root.Get(path); handles != nil {
 			for _, handle := range handles.([]Handle) {
@@ -92,6 +103,30 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 	}
+
+	//OPTIONS and METHOD_NOT_ALLOWED
+	if r.HandleOptions && req.Method == "OPTIONS" {
+		if allow := r.allowedMethod(path, req.Method); allow != "" {
+			w.Header().Set("Allow", allow)
+			return
+		}
+	} else {
+		if r.HandleMethodNotAllowed {
+			if allow := r.allowedMethod(path, req.Method); allow != "" {
+				w.Header().Set("Allow", allow)
+				if r.MethodNotAllowed != nil {
+					r.MethodNotAllowed.ServeHTTP(w, req)
+				} else {
+					http.Error(w,
+						http.StatusText(http.StatusMethodNotAllowed),
+						http.StatusMethodNotAllowed,
+					)
+				}
+				return
+			}
+		}
+	}
+
 	// Handle 404
 	if r.NotFound != nil {
 		r.NotFound.ServeHTTP(w, req)
@@ -122,4 +157,37 @@ func (r *Router) Handler(method, path string, handler http.Handler) {
 			},
 		},
 	)
+}
+
+func (r *Router) allowedMethod(path, method string) (methods string) {
+	if path == "*" {
+		for key := range r.Trees {
+			if key == "OPTIONS" {
+				continue
+			}
+			if methods == "" {
+				methods = key
+			} else {
+				methods += "," + key
+			}
+		}
+	} else {
+		for key := range r.Trees {
+			if key == method || key == "OPTIONS" {
+				continue
+			}
+			_, exist := r.Trees[key].Get(path)
+			if exist {
+				if methods == "" {
+					methods = key
+				} else {
+					methods += "," + key
+				}
+			}
+		}
+	}
+	if len(methods) > 0 {
+		methods += "," + "OPTIONS"
+	}
+	return
 }
