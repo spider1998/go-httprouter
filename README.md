@@ -1,5 +1,6 @@
 # go-httprouter
 [![Build Status](https://travis-ci.org/spider1998/go-httprouter.svg?branch=master)](https://travis-ci.org/spider1998/go-httprouter)
+[![GoDoc](http://godoc.org/github.com/spider1998/go-httprouter?status.svg)](http://godoc.org/github.com/spider1998/go-httprouter)
 
 
 轻量级高性能HTTP路由框架
@@ -35,4 +36,4 @@ func main() {
 	log.Println("start run...")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
-```
+``
