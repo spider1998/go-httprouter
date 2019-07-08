@@ -7,6 +7,7 @@ import (
 
 type Router struct {
 	Trees                  map[string]*Tree
+	PanicHandler           func(http.ResponseWriter, *http.Request)
 	NotFound               http.Handler
 	PathSlash              bool
 	UseEscapedPath         bool
@@ -81,6 +82,11 @@ func (r *Router) Handle(method, path string, handles []Handle) {
 
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
+
+	//Handle_Panic
+	if r.PanicHandler != nil {
+		defer r.handlePanic(w, req)
+	}
 
 	//USE_SLASH
 	if r.PathSlash {
@@ -190,4 +196,10 @@ func (r *Router) allowedMethod(path, method string) (methods string) {
 		methods += "," + "OPTIONS"
 	}
 	return
+}
+
+func (r *Router) handlePanic(w http.ResponseWriter, req *http.Request) {
+	if re := recover(); re != nil {
+		r.PanicHandler(w, req)
+	}
 }
