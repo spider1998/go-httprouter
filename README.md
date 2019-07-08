@@ -1,6 +1,7 @@
 # go-httprouter
 [![Build Status](https://travis-ci.org/spider1998/go-httprouter.svg?branch=master)](https://travis-ci.org/spider1998/go-httprouter)
 [![GoDoc](http://godoc.org/github.com/spider1998/go-httprouter?status.svg)](http://godoc.org/github.com/spider1998/go-httprouter)
+![](https://img.shields.io/badge/language-Go-orange.svg)
 
 
 轻量级高性能HTTP路由框架
