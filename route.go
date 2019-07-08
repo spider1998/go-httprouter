@@ -10,6 +10,7 @@ import (
 
 //Router 路由结构体
 type Router struct {
+	RouteGroup
 	Trees                  map[string]*Tree
 	PanicHandler           func(http.ResponseWriter, *http.Request)
 	NotFound               http.Handler
@@ -18,6 +19,12 @@ type Router struct {
 	HandleOptions          bool
 	HandleMethodNotAllowed bool
 	MethodNotAllowed       http.Handler
+}
+
+type RouteGroup struct {
+	Prefix   string
+	Handlers []Handler
+	Router   *Router
 }
 
 //New 创建新的路由
@@ -31,45 +38,53 @@ func New() *Router {
 	}
 }
 
+func (r *Router) Group(prefix string, handlers []Handler) *Router {
+	r.RouteGroup = RouteGroup{
+		Prefix:   prefix,
+		Handlers: handlers,
+	}
+	return r
+}
+
 //GET get方法
 //	router.GET("/", Index)
 //以下方法类似
-func (r *Router) GET(path string, handles ...Handle) {
-	r.Handle("GET", path, handles)
+func (r *Router) GET(path string, handlers ...Handler) {
+	r.Handle("GET", r.Prefix+path, combineHandlers(r, handlers))
 }
 
 //HEAD head方法
-func (r *Router) HEAD(path string, handles ...Handle) {
-	r.Handle("HEAD", path, handles)
+func (r *Router) HEAD(path string, handlers ...Handler) {
+	r.Handle("HEAD", r.Prefix+path, combineHandlers(r, handlers))
 }
 
 //OPTIONS options方法
-func (r *Router) OPTIONS(path string, handles ...Handle) {
-	r.Handle("OPTIONS", path, handles)
+func (r *Router) OPTIONS(path string, handlers ...Handler) {
+	r.Handle("OPTIONS", r.Prefix+path, combineHandlers(r, handlers))
 }
 
 //POST post方法
-func (r *Router) POST(path string, handles ...Handle) {
-	r.Handle("POST", path, handles)
+func (r *Router) POST(path string, handlers ...Handler) {
+	r.Handle("POST", r.Prefix+path, combineHandlers(r, handlers))
 }
 
 //PUT put方法
-func (r *Router) PUT(path string, handles ...Handle) {
-	r.Handle("PUT", path, handles)
+func (r *Router) PUT(path string, handlers ...Handler) {
+	r.Handle("PUT", r.Prefix+path, combineHandlers(r, handlers))
 }
 
 //PATCH patch方法
-func (r *Router) PATCH(path string, handles ...Handle) {
-	r.Handle("PATCH", path, handles)
+func (r *Router) PATCH(path string, handlers ...Handler) {
+	r.Handle("PATCH", r.Prefix+path, combineHandlers(r, handlers))
 }
 
 //DELETE delete方法
-func (r *Router) DELETE(path string, handles ...Handle) {
-	r.Handle("DELETE", path, handles)
+func (r *Router) DELETE(path string, handlers ...Handler) {
+	r.Handle("DELETE", r.Prefix+path, combineHandlers(r, handlers))
 }
 
 //Handle 路由处理函数
-type Handle func(http.ResponseWriter, *http.Request, Params)
+type Handler func(http.ResponseWriter, *http.Request, Params)
 
 //Param 路由处理参数（暂留）
 type Param struct {
@@ -82,7 +97,7 @@ type Params []Param
 //Handle 处理路由函数
 //	r.Handle("GET", path, handles)
 //存储路由
-func (r *Router) Handle(method, path string, handles []Handle) {
+func (r *Router) Handle(method, path string, handles []Handler) {
 	if path[0] != '/' {
 		panic("path must begin with '/' in path '" + path + "'")
 	}
@@ -124,7 +139,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	//Handle
 	if root := r.Trees[req.Method]; root != nil {
 		if handles, _ := root.Get(path); handles != nil {
-			for _, handle := range handles.([]Handle) {
+			for _, handle := range handles.([]Handler) {
 				handle(w, req, nil)
 			}
 			return
@@ -176,7 +191,7 @@ var ParamsKey = paramsKey{}
 // request context under ParamsKey.
 func (r *Router) Handler(method, path string, handler http.Handler) {
 	r.Handle(method, path,
-		[]Handle{
+		[]Handler{
 			func(w http.ResponseWriter, req *http.Request, p Params) {
 				ctx := req.Context()
 				ctx = context.WithValue(ctx, ParamsKey, p)
@@ -224,4 +239,8 @@ func (r *Router) handlePanic(w http.ResponseWriter, req *http.Request) {
 	if re := recover(); re != nil {
 		r.PanicHandler(w, req)
 	}
+}
+
+func combineHandlers(r *Router, handles []Handler) (handlers []Handler) {
+	return append(append(handlers, r.Handlers...), handles...)
 }
