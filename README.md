@@ -13,27 +13,39 @@ High-performance HTTP request router based on Go language
 
 Usage
 ```Go
-package mian
+package main
 
 import (
-	`fmt`
+	"fmt"
+	g "github.com/spider1998/go-httprouter"
 	`log`
-	`net/http`
-	route `github.com/spider1998/go-httprouter`
+	"net/http"
+	`testing`
 )
 
-func Index(w http.ResponseWriter, r *http.Request, ps route.Params) {
+func Index(w http.ResponseWriter, r *http.Request, ps g.Params) {
 	_, _ = fmt.Fprint(w, "Welcome!\n")
 }
 
-func Hello(w http.ResponseWriter, r *http.Request, ps route.Params) {
+func Hello(w http.ResponseWriter, r *http.Request, ps g.Params) {
 	_, _ = fmt.Fprint(w, "Hello World!\n")
 }
 
-func main() {
-	router := route.New()
+func TestHttptouter(t *testing.T) {
+	router := g.New()
+	router.Group("/test1",nil)
 	router.GET("/", Index)
 	router.GET("/hello", Hello)
+	log.Println("start run...")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+func TestRouterGroup(t *testing.T) {
+	router := g.New()
+	test1 := router.Group("/test1",nil)
+	test1.GET("/index", Index)
+	test2 := router.Group("/test2",nil)
+	test2.GET("/hello", Hello)
 	log.Println("start run...")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
