@@ -35,6 +35,10 @@ func New() *Router {
 	}
 }
 
+//Group group分组方法
+//	router.Group("/test1",1)
+//分组时第一个参数为组的路由前缀，第二个参数为组的层级，比如：第一个分组层级为1，第二个则为2，
+// 第一个分组下面在进行分组，层级为11，12，13以此类推，第二个分组下面在进行分组，层级为21，22，23以此类推，
 func (r *Router) Group(prefix string, level int) *Router {
 	r.RouterGroup.Insert(level, prefix)
 	r.Prefix = r.RouterGroup.Get(level)
