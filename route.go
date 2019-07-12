@@ -10,7 +10,8 @@ import (
 
 //Router 路由结构体
 type Router struct {
-	RouteGroup
+	RouterGroup            *RouterGroup
+	Prefix                 string
 	Trees                  map[string]*Tree
 	PanicHandler           func(http.ResponseWriter, *http.Request)
 	NotFound               http.Handler
@@ -19,12 +20,7 @@ type Router struct {
 	HandleOptions          bool
 	HandleMethodNotAllowed bool
 	MethodNotAllowed       http.Handler
-}
-
-type RouteGroup struct {
-	Prefix   string
-	Handlers []Handler
-	Router   *Router
+	Handlers               []Handler
 }
 
 //New 创建新的路由
@@ -35,14 +31,13 @@ func New() *Router {
 		PathSlash:              true,
 		HandleMethodNotAllowed: true,
 		HandleOptions:          true,
+		RouterGroup:            NewGroup(),
 	}
 }
 
-func (r *Router) Group(prefix string, handlers []Handler) *Router {
-	r.RouteGroup = RouteGroup{
-		Prefix:   r.Prefix + prefix,
-		Handlers: handlers,
-	}
+func (r *Router) Group(prefix string, level int) *Router {
+	r.RouterGroup.Insert(level, prefix)
+	r.Prefix = r.RouterGroup.Get(level)
 	return r
 }
 
@@ -81,6 +76,12 @@ func (r *Router) PATCH(path string, handlers ...Handler) {
 //DELETE delete方法
 func (r *Router) DELETE(path string, handlers ...Handler) {
 	r.Handle("DELETE", r.Prefix+path, combineHandlers(r, handlers))
+}
+
+func (r *Router) Run(w http.ResponseWriter, req *http.Request) {
+	for _, handler := range r.Handlers {
+		handler(w, req, nil)
+	}
 }
 
 //Handle 路由处理函数
@@ -139,11 +140,11 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	//Handle
 	if root := r.Trees[req.Method]; root != nil {
 		if handles, _ := root.Get(path); handles != nil {
-			for _, handle := range handles.([]Handler) {
-				handle(w, req, nil)
-			}
+			r.Handlers = handles.([]Handler)
+			r.Run(w, req)
 			return
 		}
+
 	}
 
 	//OPTIONS and METHOD_NOT_ALLOWED
