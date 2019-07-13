@@ -43,15 +43,6 @@ func Print22(w http.ResponseWriter, r *http.Request, ps g.Params) {
 	_, _ = fmt.Fprint(w, "22222222222222222222222222!\n")
 }
 
-/*func TestHttptouter(t *testing.T) {
-	router := g.New()
-	router.Group("/test1",nil)
-	router.GET("/", Index)
-	router.GET("/hello", Hello)
-	log.Println("start run...")
-	log.Fatal(http.ListenAndServe(":8080", router))
-}*/
-
 func TestRouterGroup(t *testing.T) {
 	router := g.New()
 	test1 := router.Group("/test1",1)
