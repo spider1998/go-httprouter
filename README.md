@@ -4,7 +4,7 @@
 ![](https://img.shields.io/badge/language-Go-orange.svg)
 
 
-轻量级高性能HTTP路由框架
+轻量级高性能HTTP路由框架（持续更新）
 
 High-performance HTTP request router based on Go language
 
