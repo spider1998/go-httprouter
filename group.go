@@ -16,11 +16,11 @@ func NewGroup() *RouterGroup {
 	}
 }
 
-func (r *RouterGroup) Save(index int, handlers ...Handler) {
+func (r *RouterGroup) HandlerInsert(index int, handlers ...Handler) {
 	r.Handlers[index] = handlers
 }
 
-func (r *RouterGroup) Generate(index int) (handlers []Handler) {
+func (r *RouterGroup) HandlerGenerate(index int) (handlers []Handler) {
 	if len(strconv.Itoa(index)) == 1 {
 		return r.Handlers[index]
 	} else {
@@ -33,11 +33,11 @@ func (r *RouterGroup) Generate(index int) (handlers []Handler) {
 	return
 }
 
-func (r *RouterGroup) Insert(index int, prefix string) {
+func (r *RouterGroup) PrefixInsert(index int, prefix string) {
 	r.Groups[index] = prefix
 }
 
-func (r *RouterGroup) Get(index int) (path string) {
+func (r *RouterGroup) PrefixGenerate(index int) (path string) {
 	if len(strconv.Itoa(index)) == 1 {
 		return r.Groups[index]
 	} else {
