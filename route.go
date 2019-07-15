@@ -45,8 +45,14 @@ func (r *Router) Group(prefix string, level int) *Router {
 	return r
 }
 
-func (r *Router) Use(level int, handlers ...Handler) *Router {
-	r.RouterGroup.HandlerInsert(level, handlers...)
+//User use路由预处理函数
+//	router.Use(1,Print11,Print22)
+//	test1 := router.Group("/test1", 1)
+//	test1.Use(11,Print11)
+//	test1.GET("/index", Index, Print)
+//第一个参数为路由组层级，与Group类似，可多级关联,执行当前组预处理函数时必须通过其父级预处理函数组
+func (r *Router) GroupUse(level int,handlers ...Handler) *Router {
+	r.RouterGroup.HandlerInsert(level,handlers...)
 	r.Handlers = r.RouterGroup.HandlerGenerate(level)
 	return r
 }
@@ -214,6 +220,9 @@ func (r *Router) Handler(method, path string, handler http.Handler) {
 }
 
 /*----------------------------------------------------------------------------------------------------------------------*/
+
+
+
 
 /*----------------------------------------------------------------------------------------------------------------------*/
 
