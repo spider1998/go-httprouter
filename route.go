@@ -45,6 +45,12 @@ func (r *Router) Group(prefix string, level int) *Router {
 	return r
 }
 
+func (r *Router) Use(level int, handlers ...Handler) *Router {
+	r.RouterGroup.HandlerInsert(level, handlers...)
+	r.Handlers = r.RouterGroup.HandlerGenerate(level)
+	return r
+}
+
 //GET get方法
 //	router.GET("/", Index)
 //以下方法类似
