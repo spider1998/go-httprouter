@@ -207,6 +207,10 @@ func (r *Router) Handler(method, path string, handler http.Handler) {
 	)
 }
 
+/*----------------------------------------------------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------------------------------------------------*/
+
 func (r *Router) allowedMethod(path, method string) (methods string) {
 	if path == "*" {
 		for key := range r.Trees {
