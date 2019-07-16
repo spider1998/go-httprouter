@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	g "github.com/spider1998/go-httprouter"
-	`log`
+	"log"
 	"net/http"
-	`testing`
+	"testing"
 )
 
 func Index(w http.ResponseWriter, r *http.Request, ps g.Params) {
@@ -55,16 +55,15 @@ func Print22(w http.ResponseWriter, r *http.Request, ps g.Params) {
 
 func TestRouterGroupUse(t *testing.T) {
 	router := g.New()
-	router.GroupUse(1,Print11,Print22)
+	router.GroupUse(1, Print11, Print22)
 
 	test1 := router.Group("/test1", 1)
-	test1.GroupUse(11,Print11)
+	test1.GroupUse(11, Print11)
 	test1.GET("/index", Index, Print)
 
 	test2 := router.Group("/test2", 2)
-	test2.GroupUse(11,Print22)
+	test2.GroupUse(11, Print22)
 	test2.GET("/index", Index, Print)
-
 
 	log.Println("start run...")
 	log.Fatal(http.ListenAndServe(":8080", router))

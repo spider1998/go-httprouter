@@ -20,6 +20,7 @@ type Router struct {
 	HandleOptions          bool
 	HandleMethodNotAllowed bool
 	MethodNotAllowed       http.Handler
+	HandlerIndex           int
 	Handlers               []Handler
 }
 
@@ -51,8 +52,8 @@ func (r *Router) Group(prefix string, level int) *Router {
 //	test1.Use(11,Print11)
 //	test1.GET("/index", Index, Print)
 //第一个参数为路由组层级，与Group类似，可多级关联,执行当前组预处理函数时必须通过其父级预处理函数组
-func (r *Router) GroupUse(level int,handlers ...Handler) *Router {
-	r.RouterGroup.HandlerInsert(level,handlers...)
+func (r *Router) GroupUse(level int, handlers ...Handler) *Router {
+	r.RouterGroup.HandlerInsert(level, handlers...)
 	r.Handlers = r.RouterGroup.HandlerGenerate(level)
 	return r
 }
@@ -94,9 +95,11 @@ func (r *Router) DELETE(path string, handlers ...Handler) {
 	r.Handle("DELETE", r.Prefix+path, combineHandlers(r, handlers))
 }
 
-func (r *Router) Run(w http.ResponseWriter, req *http.Request) {
-	for _, handler := range r.Handlers {
-		handler(w, req, nil)
+// Next调用与当前路由关联的其余处理程序
+func (r *Router) HandlerNext(w http.ResponseWriter, req *http.Request) {
+	r.HandlerIndex++
+	for i := len(r.Handlers); i > r.HandlerIndex; r.HandlerIndex++ {
+		r.Handlers[r.HandlerIndex](w, req, nil)
 	}
 }
 
@@ -157,7 +160,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if root := r.Trees[req.Method]; root != nil {
 		if handles, _ := root.Get(path); handles != nil {
 			r.Handlers = handles.([]Handler)
-			r.Run(w, req)
+			r.HandlerNext(w, req)
 			return
 		}
 
@@ -220,9 +223,6 @@ func (r *Router) Handler(method, path string, handler http.Handler) {
 }
 
 /*----------------------------------------------------------------------------------------------------------------------*/
-
-
-
 
 /*----------------------------------------------------------------------------------------------------------------------*/
 
