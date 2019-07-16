@@ -103,6 +103,11 @@ func (r *Router) HandlerNext(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+//Abort跳过其余处理程序
+func (r *Router) Abort() {
+	r.HandlerIndex = len(r.Handlers)
+}
+
 //Handle 路由处理函数
 type Handler func(http.ResponseWriter, *http.Request, Params)
 
