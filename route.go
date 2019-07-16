@@ -24,6 +24,8 @@ type Router struct {
 	Handlers               []Handler
 }
 
+/*----------------------------------------------------------------------------------------------------------------------*/
+
 //New 创建新的路由
 //	router := g.New()
 //返回路由实例
@@ -35,6 +37,8 @@ func New() *Router {
 		RouterGroup:            NewGroup(),
 	}
 }
+
+/*----------------------------------------------------------------------------------------------------------------------*/
 
 //Group group分组方法
 //	router.Group("/test1",1)
@@ -57,6 +61,8 @@ func (r *Router) GroupUse(level int, handlers ...Handler) *Router {
 	r.Handlers = r.RouterGroup.HandlerGenerate(level)
 	return r
 }
+
+/*----------------------------------------------------------------------------------------------------------------------*/
 
 //GET get方法
 //	router.GET("/", Index)
@@ -93,19 +99,6 @@ func (r *Router) PATCH(path string, handlers ...Handler) {
 //DELETE delete方法
 func (r *Router) DELETE(path string, handlers ...Handler) {
 	r.Handle("DELETE", r.Prefix+path, combineHandlers(r, handlers))
-}
-
-// Next调用与当前路由关联的其余处理程序
-func (r *Router) HandlerNext(w http.ResponseWriter, req *http.Request) {
-	r.HandlerIndex++
-	for i := len(r.Handlers); i > r.HandlerIndex; r.HandlerIndex++ {
-		r.Handlers[r.HandlerIndex](w, req, nil)
-	}
-}
-
-//Abort跳过其余处理程序
-func (r *Router) Abort() {
-	r.HandlerIndex = len(r.Handlers)
 }
 
 //Handle 路由处理函数
@@ -228,6 +221,18 @@ func (r *Router) Handler(method, path string, handler http.Handler) {
 }
 
 /*----------------------------------------------------------------------------------------------------------------------*/
+// Next调用与当前路由关联的其余处理程序
+func (r *Router) HandlerNext(w http.ResponseWriter, req *http.Request) {
+	r.HandlerIndex++
+	for i := len(r.Handlers); i > r.HandlerIndex; r.HandlerIndex++ {
+		r.Handlers[r.HandlerIndex](w, req, nil)
+	}
+}
+
+//Abort跳过其余处理程序
+func (r *Router) Abort() {
+	r.HandlerIndex = len(r.Handlers)
+}
 
 /*----------------------------------------------------------------------------------------------------------------------*/
 
