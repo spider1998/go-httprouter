@@ -22,6 +22,7 @@ type Router struct {
 	MethodNotAllowed       http.Handler
 	HandlerIndex           int
 	Handlers               []Handler
+	Data                   map[string]interface{}
 }
 
 /*----------------------------------------------------------------------------------------------------------------------*/
@@ -232,6 +233,19 @@ func (r *Router) HandlerNext(w http.ResponseWriter, req *http.Request) {
 //Abort跳过其余处理程序
 func (r *Router) Abort() {
 	r.HandlerIndex = len(r.Handlers)
+}
+
+//SetData 将信息存储在上下文中，以便以后检索
+func (r *Router) SetData(key string, value interface{}) {
+	if r.Data == nil {
+		r.Data = make(map[string]interface{})
+	}
+	r.Data[key] = value
+}
+
+//GetData 获取上下文存储的数据
+func (r *Router) GetData(key string) interface{} {
+	return r.Data[key]
 }
 
 /*----------------------------------------------------------------------------------------------------------------------*/
