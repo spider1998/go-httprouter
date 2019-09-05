@@ -23,7 +23,6 @@ type Router struct {
 	Data                   map[string]interface{}
 }
 
-
 //New 创建新的路由
 //	router := g.New()
 //返回路由实例
@@ -35,7 +34,6 @@ func New() *Router {
 		RouterGroup:            NewGroup(),
 	}
 }
-
 
 //Group group分组方法
 //	router.Group("/test1",1)
@@ -58,7 +56,6 @@ func (r *Router) GroupUse(level int, handlers ...Handler) *Router {
 	r.Handlers = r.RouterGroup.HandlerGenerate(level)
 	return r
 }
-
 
 //GET get方法
 //	router.GET("/", Index)

@@ -49,11 +49,11 @@ var AllowAll = Options{
 }
 
 // Cors Handler creates a routing handler that adds appropriate CORS headers according to the specified options and the request.
-func (r *Router)Cors(opts Options) Handler {
+func (r *Router) Cors(opts Options) Handler {
 
 	opts.init()
 
-	return func(res http.ResponseWriter, req *http.Request, p Params){
+	return func(res http.ResponseWriter, req *http.Request, p Params) {
 		origin := req.Header.Get(headerOrigin)
 		if origin == "" {
 			// the request is outside the scope of CORS
@@ -61,7 +61,7 @@ func (r *Router)Cors(opts Options) Handler {
 		}
 		if req.Method == "OPTIONS" {
 			// a preflight request
-			method :=req.Header.Get(headerRequestMethod)
+			method := req.Header.Get(headerRequestMethod)
 			if method == "" {
 				// the request is outside the scope of CORS
 				return
