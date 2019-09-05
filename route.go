@@ -23,7 +23,6 @@ type Router struct {
 	Data                   map[string]interface{}
 }
 
-/*----------------------------------------------------------------------------------------------------------------------*/
 
 //New 创建新的路由
 //	router := g.New()
@@ -37,7 +36,6 @@ func New() *Router {
 	}
 }
 
-/*----------------------------------------------------------------------------------------------------------------------*/
 
 //Group group分组方法
 //	router.Group("/test1",1)
@@ -61,7 +59,6 @@ func (r *Router) GroupUse(level int, handlers ...Handler) *Router {
 	return r
 }
 
-/*----------------------------------------------------------------------------------------------------------------------*/
 
 //GET get方法
 //	router.GET("/", Index)
@@ -220,7 +217,6 @@ func (r *Router) Handler(method, path string, handler http.Handler) {
 	)
 }
 
-/*----------------------------------------------------------------------------------------------------------------------*/
 //HandlerNext Next调用与当前路由关联的其余处理程序
 func (r *Router) HandlerNext(w http.ResponseWriter, req *http.Request) {
 	r.HandlerIndex++
