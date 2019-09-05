@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/spider1998/go-httprouter.svg?branch=master)](https://travis-ci.org/spider1998/go-httprouter)
 [![GoDoc](http://godoc.org/github.com/spider1998/go-httprouter?status.svg)](http://godoc.org/github.com/spider1998/go-httprouter)
 ![](https://img.shields.io/badge/language-Go-orange.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/spider1998/go-httprouter)](https://goreportcard.com/report/github.com/spider1998/go-httprouter)
 
 
 轻量级高性能HTTP路由框架（底层存储由基数树实现）（持续更新）	
