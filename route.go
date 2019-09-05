@@ -1,7 +1,5 @@
-//router.go文件
-
-//提供简单http路由
-package go_httprouter
+//gohttprouter 提供简单http路由
+package gohttprouter
 
 import (
 	"golang.org/x/net/context"
@@ -51,7 +49,7 @@ func (r *Router) Group(prefix string, level int) *Router {
 	return r
 }
 
-//User use路由预处理函数
+//GroupUse use路由预处理函数
 //	router.Use(1,Print11,Print22)
 //	test1 := router.Group("/test1", 1)
 //	test1.Use(11,Print11)
@@ -111,6 +109,7 @@ type Param struct {
 	Value string
 }
 
+//Params
 type Params []Param
 
 //Handle 处理路由函数
@@ -222,7 +221,7 @@ func (r *Router) Handler(method, path string, handler http.Handler) {
 }
 
 /*----------------------------------------------------------------------------------------------------------------------*/
-// Next调用与当前路由关联的其余处理程序
+//HandlerNext Next调用与当前路由关联的其余处理程序
 func (r *Router) HandlerNext(w http.ResponseWriter, req *http.Request) {
 	r.HandlerIndex++
 	for i := len(r.Handlers); i > r.HandlerIndex; r.HandlerIndex++ {
@@ -230,7 +229,7 @@ func (r *Router) HandlerNext(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-//Abort跳过其余处理程序
+//Abort 跳过其余处理程序
 func (r *Router) Abort() {
 	r.HandlerIndex = len(r.Handlers)
 }

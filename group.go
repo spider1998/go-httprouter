@@ -1,14 +1,16 @@
-package go_httprouter
+package gohttprouter
 
 import (
 	"strconv"
 )
 
+//RouterGroup
 type RouterGroup struct {
 	Groups   map[int]string
 	Handlers map[int][]Handler
 }
 
+//NewGroup
 func NewGroup() *RouterGroup {
 	return &RouterGroup{
 		Groups:   map[int]string{},
@@ -16,12 +18,12 @@ func NewGroup() *RouterGroup {
 	}
 }
 
-//加入路由组处理方法
+//HandlerInsert 加入路由组处理方法
 func (r *RouterGroup) HandlerInsert(index int, handlers ...Handler) {
 	r.Handlers[index] = handlers
 }
 
-//获取路由组所有指定执行的方法
+//HandlerGenerate 获取路由组所有指定执行的方法
 func (r *RouterGroup) HandlerGenerate(index int) (handlers []Handler) {
 	if len(strconv.Itoa(index)) == 1 {
 		return r.Handlers[index]
@@ -31,16 +33,16 @@ func (r *RouterGroup) HandlerGenerate(index int) (handlers []Handler) {
 			key, _ := strconv.Atoi(k)
 			handlers = append(handlers, r.Handlers[key]...)
 		}
+		return
 	}
-	return
 }
 
-//加入路由组前缀
+//PrefixInsert 加入路由组前缀
 func (r *RouterGroup) PrefixInsert(index int, prefix string) {
 	r.Groups[index] = prefix
 }
 
-//生成路由组前缀
+//PrefixGenerate 生成路由组前缀
 func (r *RouterGroup) PrefixGenerate(index int) (path string) {
 	if len(strconv.Itoa(index)) == 1 {
 		return r.Groups[index]
@@ -50,6 +52,6 @@ func (r *RouterGroup) PrefixGenerate(index int) (path string) {
 			key, _ := strconv.Atoi(k)
 			path += r.Groups[key]
 		}
+		return
 	}
-	return
 }

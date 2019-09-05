@@ -1,29 +1,31 @@
-//radix.go文件
-
-//提供路由处理存储
-package go_httprouter
+//gohttprouter 提供路由处理存储
+package gohttprouter
 
 import (
 	"sort"
 	"strings"
 )
 
+//Tree 存储实体结构
 type Tree struct {
 	Root *Node
 	Size int
 }
 
+//Node
 type Node struct {
 	Leaf   *LeafNode
 	Prefix string
 	Sons   Sons
 }
 
+//LeafNode
 type LeafNode struct {
 	Key   string
 	Value interface{}
 }
 
+//NewTree
 func NewTree() *Tree {
 	return &Tree{
 		Root: &Node{},
@@ -116,7 +118,7 @@ func (t *Tree) Insert(key string, value interface{}) (interface{}, bool) {
 	}
 }
 
-//GET 通过路由获取处理函数
+//Get 通过路由获取处理函数
 //	if handles, _ := root.Get(path); handles != nil {
 //			for _, handle := range handles.([]Handle) {
 //				handle(w, req, nil)
@@ -184,28 +186,36 @@ func (n *Node) updateSon(label byte, node *Node) {
 	panic("replacing missing son")
 }
 
+//Sons
 type Sons []Son
 
+//Son 子节点
 type Son struct {
 	Label byte
 	Node  *Node
 }
 
+//Len
 func (s Sons) Len() int {
 	return len(s)
 }
 
+//Less
 func (s Sons) Less(i, j int) bool {
 	return s[i].Label < s[j].Label
 }
 
+//Swap
 func (s Sons) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
+
+//Sort
 func (s Sons) Sort() {
 	sort.Sort(s)
 }
 
+//AddRoute 添加路由
 func (t *Tree) AddRoute(path string, handlers []Handler) {
 	t.Insert(path, handlers)
 }

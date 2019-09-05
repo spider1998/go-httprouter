@@ -1,4 +1,4 @@
-package go_httprouter
+package gohttprouter
 
 import (
 	"net/http"
@@ -48,6 +48,7 @@ var AllowAll = Options{
 	AllowMethods: "*",
 }
 
+// Cors
 // Handler creates a routing handler that adds appropriate CORS headers according to the specified options and the request.
 func (r *Router)Cors(opts Options) Handler {
 
