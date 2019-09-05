@@ -1,4 +1,4 @@
-//gohttprouter 提供路由处理存储
+//Package gohttprouter 提供路由处理存储
 package gohttprouter
 
 import (
@@ -12,20 +12,20 @@ type Tree struct {
 	Size int
 }
 
-//Node
+//Node 节点
 type Node struct {
 	Leaf   *LeafNode
 	Prefix string
 	Sons   Sons
 }
 
-//LeafNode
+//LeafNode 叶子节点
 type LeafNode struct {
 	Key   string
 	Value interface{}
 }
 
-//NewTree
+//NewTree 创建树
 func NewTree() *Tree {
 	return &Tree{
 		Root: &Node{},
@@ -186,7 +186,7 @@ func (n *Node) updateSon(label byte, node *Node) {
 	panic("replacing missing son")
 }
 
-//Sons
+//Sons 子节点集合
 type Sons []Son
 
 //Son 子节点
@@ -195,22 +195,22 @@ type Son struct {
 	Node  *Node
 }
 
-//Len
+//Len 获取长度
 func (s Sons) Len() int {
 	return len(s)
 }
 
-//Less
+//Less 比较大小
 func (s Sons) Less(i, j int) bool {
 	return s[i].Label < s[j].Label
 }
 
-//Swap
+//Swap 交换值
 func (s Sons) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 
-//Sort
+//Sort 排序
 func (s Sons) Sort() {
 	sort.Sort(s)
 }

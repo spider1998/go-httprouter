@@ -4,13 +4,13 @@ import (
 	"strconv"
 )
 
-//RouterGroup
+//RouterGroup 路由组
 type RouterGroup struct {
 	Groups   map[int]string
 	Handlers map[int][]Handler
 }
 
-//NewGroup
+//NewGroup 创建新路由组
 func NewGroup() *RouterGroup {
 	return &RouterGroup{
 		Groups:   map[int]string{},
@@ -27,14 +27,14 @@ func (r *RouterGroup) HandlerInsert(index int, handlers ...Handler) {
 func (r *RouterGroup) HandlerGenerate(index int) (handlers []Handler) {
 	if len(strconv.Itoa(index)) == 1 {
 		return r.Handlers[index]
-	} else {
-		for i := 0; i <= len(strconv.Itoa(index)); i++ {
-			k := strconv.Itoa(index)[:i]
-			key, _ := strconv.Atoi(k)
-			handlers = append(handlers, r.Handlers[key]...)
-		}
-		return
 	}
+	for i := 0; i <= len(strconv.Itoa(index)); i++ {
+		k := strconv.Itoa(index)[:i]
+		key, _ := strconv.Atoi(k)
+		handlers = append(handlers, r.Handlers[key]...)
+	}
+	return
+
 }
 
 //PrefixInsert 加入路由组前缀
@@ -46,12 +46,11 @@ func (r *RouterGroup) PrefixInsert(index int, prefix string) {
 func (r *RouterGroup) PrefixGenerate(index int) (path string) {
 	if len(strconv.Itoa(index)) == 1 {
 		return r.Groups[index]
-	} else {
-		for i := 0; i <= len(strconv.Itoa(index)); i++ {
-			k := strconv.Itoa(index)[:i]
-			key, _ := strconv.Atoi(k)
-			path += r.Groups[key]
-		}
-		return
 	}
+	for i := 0; i <= len(strconv.Itoa(index)); i++ {
+		k := strconv.Itoa(index)[:i]
+		key, _ := strconv.Atoi(k)
+		path += r.Groups[key]
+	}
+	return
 }

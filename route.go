@@ -1,4 +1,4 @@
-//gohttprouter 提供简单http路由
+//Package gohttprouter 提供简单http路由
 package gohttprouter
 
 import (
@@ -97,7 +97,7 @@ func (r *Router) DELETE(path string, handlers ...Handler) {
 	r.Handle("DELETE", r.Prefix+path, combineHandlers(r, handlers))
 }
 
-//Handle 路由处理函数
+//Handler 路由处理函数
 type Handler func(http.ResponseWriter, *http.Request, Params)
 
 //Param 路由处理参数（暂留）
@@ -106,7 +106,7 @@ type Param struct {
 	Value string
 }
 
-//Params
+//Params 参数集合
 type Params []Param
 
 //Handle 处理路由函数
@@ -199,6 +199,7 @@ func (r *Router) HandlerFunc(method, path string, handler http.HandlerFunc) {
 
 type paramsKey struct{}
 
+//ParamsKey 参数key
 var ParamsKey = paramsKey{}
 
 // Handler is an adapter which allows the usage of an http.Handler as a
